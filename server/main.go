@@ -10,7 +10,7 @@ import (
 	"time"
 )
 
-type Args struct {
+type Nums struct {
 	A, B int
 }
 
@@ -20,31 +20,32 @@ type Quotient struct {
 
 type Arith int
 
-//计算乘积
-func (t *Arith) Multiply(args *Args, reply *int) error {
-	time.Sleep(time.Second * 3) //睡三秒，同步调用会等待，异步会先往下执行
-	*reply = args.A * args.B
+//乘法計算
+func (t *Arith) Multiply(nums *Nums, reply *int) error {
+	time.Sleep(time.Second * 3) //dealy三秒 同步會等待 異步會繼續執行下面的
+	*reply = nums.A * nums.B
 	return nil
 }
 
-//计算商和余数
-func (t *Arith) Divide(args *Args, quo *Quotient) error {
+//商數和餘數
+func (t *Arith) Divide(nums *Nums, quo *Quotient) error {
 	time.Sleep(time.Second * 3)
-	if args.B == 0 {
+	if nums.B == 0 {
 		return errors.New("divide by zero")
 	}
-	quo.Quo = args.A / args.B
-	quo.Rem = args.A % args.B
+	quo.Quo = nums.A / nums.B
+	quo.Rem = nums.A % nums.B
 	return nil
 }
 
 func main() {
-	//创建对象
+	//創建對象
 	arith := new(Arith)
-	//rpc服务注册了一个arith对象 公开方法供客户端调用
+	//rpc server註冊了一个arith對象 公開方法讓client調用
 	rpc.Register(arith)
-	//指定rpc的传输协议 这里采用http协议作为rpc调用的载体 也可以用rpc.ServeConn处理单个连接请求
+	//指定rpc的傳輸協議 這裡採用http協議作為rpc調用的方法 也可以用rpc.ServeConn處理單個連接請求
 	rpc.HandleHTTP()
+
 	l, e := net.Listen("tcp", ":1234")
 	if e != nil {
 		log.Fatal("listen error", e)
